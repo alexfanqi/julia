@@ -231,7 +231,12 @@ endif
 ifneq (,$(LIBGFORTRAN_VERSION))
 $(eval $(call symlink_system_library,CSL,libgfortran,$(LIBGFORTRAN_VERSION)))
 endif
+# riscv doesn't need libquadmath
+ifeq ($(DIST_ARCH),riscv64)
+$(eval $(call symlink_system_library,CSL,libquadmath,0,ALLOW_FAILURE))
+else
 $(eval $(call symlink_system_library,CSL,libquadmath,0))
+endif
 $(eval $(call symlink_system_library,CSL,libstdc++,6))
 # We allow libssp, libatomic and libgomp to fail as they are not available on all systems
 $(eval $(call symlink_system_library,CSL,libssp,0,ALLOW_FAILURE))

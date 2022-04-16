@@ -78,6 +78,9 @@ static inline __attribute__((unused)) uintptr_t jl_get_rsp_from_ctx(const void *
 #elif defined(_OS_LINUX_) && defined(_CPU_ARM_)
     const ucontext_t *ctx = (const ucontext_t*)_ctx;
     return ctx->uc_mcontext.arm_sp;
+#elif defined(_OS_LINUX_) && (defined(_CPU_RISCV64_))
+    const ucontext_t *ctx = (const ucontext_t*)_ctx;
+    return ctx->uc_mcontext.__gregs[REG_SP];
 #elif defined(_OS_DARWIN_) && defined(_CPU_X86_64_)
     const ucontext64_t *ctx = (const ucontext64_t*)_ctx;
     return ctx->uc_mcontext64->__ss.__rsp;
@@ -173,6 +176,11 @@ JL_NO_ASAN static void jl_call_in_ctx(jl_ptls_t ptls, void (*fptr)(void), int si
     ctx->uc_mcontext.arm_sp = rsp;
     ctx->uc_mcontext.arm_lr = 0; // Clear link register
     ctx->uc_mcontext.arm_pc = target;
+#elif defined(_OS_LINUX_) && (defined(_CPU_RISCV64_))
+    ucontext_t *ctx = (ucontext_t*)_ctx;
+    ctx->uc_mcontext.__gregs[REG_SP] = rsp;
+    ctx->uc_mcontext.__gregs[REG_RA] = 0; // Clear return address register ra
+    ctx->uc_mcontext.__gregs[REG_PC] = (uintptr_t)fptr;
 #elif defined(_OS_DARWIN_) && (defined(_CPU_X86_64_) || defined(_CPU_AARCH64_))
     // Only used for SIGFPE.
     // This doesn't seems to be reliable when the SIGFPE is generated

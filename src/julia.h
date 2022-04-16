@@ -26,8 +26,8 @@
 #  define jl_jmp_buf sigjmp_buf
 #  if defined(_CPU_ARM_) || defined(_CPU_PPC_) || defined(_CPU_WASM_)
 #    define MAX_ALIGN 8
-#  elif defined(_CPU_AARCH64_)
-// int128 is 16 bytes aligned on aarch64
+#  elif defined(_CPU_AARCH64_) || defined(_CPU_RISCV64_)
+// int128 on aarch64 and __int128 on riscv64 are 16 bytes aligned
 #    define MAX_ALIGN 16
 #  elif defined(_P64)
 // Generically we assume MAX_ALIGN is sizeof(void*)

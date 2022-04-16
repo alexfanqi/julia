@@ -851,6 +851,10 @@ static inline void dump_cpu_spec(uint32_t cpu, const FeatureList<n> &features,
 
 #include "processor_arm.cpp"
 
+#elif defined(_CPU_RISCV64_)
+
+#include "processor_riscv.cpp"
+
 #else
 
 #include "processor_fallback.cpp"

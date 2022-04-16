@@ -50,6 +50,13 @@
 # define JL_USE_JITLINK
 #endif
 
+#if defined(_CPU_RISCV64_)
+# if JL_LLVM_VERSION < 140000
+#  pragma message("On riscv, LLVM version >= 14 is required for JITLink support")
+# endif
+# define JL_USE_JITLINK
+#endif
+
 #ifdef JL_USE_JITLINK
 # include <llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h>
 #else

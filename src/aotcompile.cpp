@@ -506,7 +506,7 @@ void jl_dump_native_impl(void *native_code,
 #else
             Optional<Reloc::Model>(),
 #endif
-#if defined(_CPU_PPC_) || defined(_CPU_PPC64_)
+#if defined(_CPU_PPC_) || defined(_CPU_PPC64_) || defined(_CPU_RISCV64_)
             // On PPC the small model is limited to 16bit offsets
             CodeModel::Medium,
 #else

@@ -116,6 +116,8 @@ Instruction *LowerPTLS::emit_pgcstack_tp(Value *offset, Instruction *insertBefor
         const char *asm_str = "mrs $0, tpidr_el0";
 #elif defined(__ARM_ARCH) && __ARM_ARCH >= 7
         const char *asm_str = "mrc p15, 0, $0, c13, c0, 3";
+#elif defined(_CPU_RISCV64_)
+	    const char *asm_str = "mv $0, tp";
 #elif defined(_CPU_X86_64_)
         const char *asm_str = "movq %fs:0, $0";
 #elif defined(_CPU_X86_)

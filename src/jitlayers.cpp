@@ -957,6 +957,19 @@ namespace {
         options.EmulatedTLS = true;
         options.ExplicitEmulatedTLS = true;
 #endif
+		 // set this manually to avoid llvm defaulting to soft float and
+		 // resulting in linker error: `can't link double-float modules
+		 // with soft-float modules` on riscv
+		 // ref: https://github.com/llvm/llvm-project/blob/afa520ab34803c82587ea6759bfd352579f741b4/llvm/lib/Target/RISCV/RISCVTargetMachine.cpp#L90
+#if defined(_CPU_RISCV64_)
+#if defined(__riscv_float_abi_double)
+	    options.MCOptions.ABIName = "lp64d";
+#elif defined(__riscv_float_abi_single)
+		options.MCOptions.ABIName = "lp64f";
+#else
+		options.MCOptions.ABIName = "lp64";
+#endif
+#endif
 
         Triple TheTriple(sys::getProcessTriple());
 #if defined(FORCE_ELF)
@@ -999,18 +1012,27 @@ namespace {
         }
         // Allocate a target...
         Optional<CodeModel::Model> codemodel =
-#ifdef _P64
+#if defined(_CPU_RISCV64_)
+	    // RISCV doesn not support large codemodel
+            CodeModel::Medium;
+#elif defined(_P64)
             // Make sure we are using the large code model on 64bit
             // Let LLVM pick a default suitable for jitting on 32bit
             CodeModel::Large;
 #else
             None;
 #endif
+        Reloc::Model relocmodel =
+#if defined(_CPU_RISCV64_)
+            Reloc::PIC_;
+#else
+            Reloc::Static; // Generate simpler code for JIT
+#endif
         auto optlevel = CodeGenOptLevelFor(jl_options.opt_level);
         auto TM = TheTarget->createTargetMachine(
                 TheTriple.getTriple(), TheCPU, FeaturesStr,
                 options,
-                Reloc::Static, // Generate simpler code for JIT
+                relocmodel,
                 codemodel,
                 optlevel,
                 true // JIT
@@ -1039,7 +1061,7 @@ namespace {
         .setCPU(TM.getTargetCPU().str())
         .setFeatures(TM.getTargetFeatureString())
         .setOptions(TM.Options)
-        .setRelocationModel(Reloc::Static)
+        .setRelocationModel(TM.getRelocationModel())
         .setCodeModel(TM.getCodeModel())
         .setCodeGenOptLevel(CodeGenOptLevelFor(optlevel));
     }

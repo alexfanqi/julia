@@ -47,7 +47,7 @@ typedef struct {
     !defined(JL_HAVE_SIGALTSTACK) && \
     !defined(JL_HAVE_ASYNCIFY)
 #if (defined(_CPU_X86_64_) || defined(_CPU_X86_) || defined(_CPU_AARCH64_) ||  \
-     defined(_CPU_ARM_) || defined(_CPU_PPC64_))
+     defined(_CPU_ARM_) || defined(_CPU_RISCV64_) || defined(_CPU_PPC64_))
 #define JL_HAVE_ASM
 #endif
 #if 0

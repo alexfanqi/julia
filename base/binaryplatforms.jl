@@ -196,7 +196,7 @@ end
 function validate_tags(tags::Dict)
     throw_invalid_key(k) = throw(ArgumentError("Key \"$(k)\" cannot have value \"$(tags[k])\""))
     # Validate `arch`
-    if tags["arch"] ∉ ("x86_64", "i686", "armv7l", "armv6l", "aarch64", "powerpc64le")
+    if tags["arch"] ∉ ("x86_64", "i686", "armv7l", "armv6l", "aarch64", "riscv64", "powerpc64le")
         throw_invalid_key("arch")
     end
     # Validate `os`
@@ -592,6 +592,7 @@ const arch_mapping = Dict(
     "aarch64" => "(aarch64|arm64)",
     "armv7l" => "arm(v7l)?", # if we just see `arm-linux-gnueabihf`, we assume it's `armv7l`
     "armv6l" => "armv6l",
+    "riscv64" => "(rv64|riscv64)",
     "powerpc64le" => "p(ower)?pc64le",
 )
 # Keep this in sync with `CPUID.ISAs_by_family`
@@ -625,6 +626,9 @@ const arch_march_isa_mapping = let
             "armv8_2_crypto" => get_set("aarch64", "armv8.2-a+crypto"),
             "a64fx" => get_set("aarch64", "a64fx"),
             "apple_m1" => get_set("aarch64", "apple_m1"),
+        ],
+        "riscv64" => [
+            "riscv64" => get_set("riscv64", "riscv64")
         ],
         "powerpc64le" => [
             "power8" => get_set("powerpc64le", "power8"),
