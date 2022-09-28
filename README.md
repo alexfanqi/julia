@@ -31,6 +31,9 @@
     </tr>
 </table>
 
+## RISCV64 build tips
+See <https://github.com/alexfanqi/julia/tree/master/doc/src/devdocs/build/riscv.md>
+
 ## The Julia Language
 
 Julia is a high-level, high-performance dynamic language for technical

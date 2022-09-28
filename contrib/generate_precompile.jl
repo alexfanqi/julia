@@ -138,23 +138,23 @@ if Distributed !== nothing
 end
 
 
-Artifacts = get(Base.loaded_modules,
-          Base.PkgId(Base.UUID("56f22d72-fd6d-98f1-02f0-08ddc0907c33"), "Artifacts"),
-          nothing)
-if Artifacts !== nothing
-    precompile_script *= """
-    using Artifacts, Base.BinaryPlatforms, Libdl
-    artifacts_toml = abspath(joinpath(Sys.STDLIB, "Artifacts", "test", "Artifacts.toml"))
-    artifact_hash("HelloWorldC", artifacts_toml)
-    oldpwd = pwd(); cd(dirname(artifacts_toml))
-    macroexpand(Main, :(@artifact_str("HelloWorldC")))
-    cd(oldpwd)
-    artifacts = Artifacts.load_artifacts_toml(artifacts_toml)
-    platforms = [Artifacts.unpack_platform(e, "HelloWorldC", artifacts_toml) for e in artifacts["HelloWorldC"]]
-    best_platform = select_platform(Dict(p => triplet(p) for p in platforms))
-    dlopen("libjulia$(Base.isdebugbuild() ? "-debug" : "")", RTLD_LAZY | RTLD_DEEPBIND)
-    """
-end
+#Artifacts = get(Base.loaded_modules,
+#          Base.PkgId(Base.UUID("56f22d72-fd6d-98f1-02f0-08ddc0907c33"), "Artifacts"),
+#          nothing)
+#if Artifacts !== nothing
+#    precompile_script *= """
+#    using Artifacts, Base.BinaryPlatforms, Libdl
+#    artifacts_toml = abspath(joinpath(Sys.STDLIB, "Artifacts", "test", "Artifacts.toml"))
+#    artifact_hash("HelloWorldC", artifacts_toml)
+#    oldpwd = pwd(); cd(dirname(artifacts_toml))
+#    macroexpand(Main, :(@artifact_str("HelloWorldC")))
+#    cd(oldpwd)
+#    artifacts = Artifacts.load_artifacts_toml(artifacts_toml)
+#    platforms = [Artifacts.unpack_platform(e, "HelloWorldC", artifacts_toml) for e in artifacts["HelloWorldC"]]
+#    best_platform = select_platform(Dict(p => triplet(p) for p in platforms))
+#    dlopen("libjulia$(ccall(:jl_is_debugbuild, Cint, ()) != 0 ? "-debug" : "")", RTLD_LAZY | RTLD_DEEPBIND)
+#    """
+#end
 
 
 Pkg = get(Base.loaded_modules,
@@ -376,7 +376,7 @@ function generate_precompile_statements()
     include_time = @elapsed for statement in statements
         # println(statement)
         # XXX: skip some that are broken. these are caused by issue #39902
-        occursin("Tuple{Artifacts.var\"#@artifact_str\", LineNumberNode, Module, Any, Any}", statement) && continue
+        #occursin("Tuple{Artifacts.var\"#@artifact_str\", LineNumberNode, Module, Any, Any}", statement) && continue
         occursin("Tuple{Base.Cartesian.var\"#@ncall\", LineNumberNode, Module, Int64, Any, Vararg{Any}}", statement) && continue
         occursin("Tuple{Base.Cartesian.var\"#@ncall\", LineNumberNode, Module, Int32, Any, Vararg{Any}}", statement) && continue
         occursin("Tuple{Base.Cartesian.var\"#@nloops\", LineNumberNode, Module, Any, Any, Any, Vararg{Any}}", statement) && continue
