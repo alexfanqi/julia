@@ -601,6 +601,18 @@ void jl_dump_native_impl(void *native_code,
         // but LLVM doesn't let us emit a GlobalAlias to a declaration...
         // So for now we inject a definition of these functions that calls our runtime
         // functions. We do so after optimization to avoid cloning these functions.
+#if defined(_CPU_RISCV64_)
+        injectCRTAlias(M, "__gnu_h2f_ieee", "julia__gnu_h2f_ieee",
+                FunctionType::get(Type::getFloatTy(Context), { Type::getInt16Ty(Context) }, false));
+        injectCRTAlias(M, "__extendhfsf2", "julia__gnu_h2f_ieee",
+                FunctionType::get(Type::getFloatTy(Context), { Type::getInt16Ty(Context) }, false));
+        injectCRTAlias(M, "__gnu_f2h_ieee", "julia__gnu_f2h_ieee",
+                FunctionType::get(Type::getInt16Ty(Context), { Type::getFloatTy(Context) }, false));
+        injectCRTAlias(M, "__truncsfhf2", "julia__gnu_f2h_ieee",
+                FunctionType::get(Type::getInt16Ty(Context), { Type::getFloatTy(Context) }, false));
+        injectCRTAlias(M, "__truncdfhf2", "julia__truncdfhf2",
+                FunctionType::get(Type::getInt16Ty(Context), { Type::getDoubleTy(Context) }, false));
+#else
         injectCRTAlias(M, "__gnu_h2f_ieee", "julia__gnu_h2f_ieee",
                 FunctionType::get(Type::getFloatTy(Context), { Type::getHalfTy(Context) }, false));
         injectCRTAlias(M, "__extendhfsf2", "julia__gnu_h2f_ieee",
@@ -611,6 +623,7 @@ void jl_dump_native_impl(void *native_code,
                 FunctionType::get(Type::getHalfTy(Context), { Type::getFloatTy(Context) }, false));
         injectCRTAlias(M, "__truncdfhf2", "julia__truncdfhf2",
                 FunctionType::get(Type::getHalfTy(Context), { Type::getDoubleTy(Context) }, false));
+#endif
 
         postopt.run(M, empty.MAM);
         emitter.run(M);

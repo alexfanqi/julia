@@ -169,7 +169,7 @@ end
     @test_intrinsic Core.Intrinsics.fptoui UInt Float16(3.3) UInt(3)
 end
 
-if Sys.ARCH == :aarch64 ||  Sys.ARCH === :powerpc64le || Sys.ARCH === :ppc64le
+if Sys.ARCH == :aarch64 ||  Sys.ARCH === :powerpc64le || Sys.ARCH === :ppc64le || Sys.ARCH === :riscv64
     # On AArch64 we are following the `_Float16` ABI. Buthe these functions expect `Int16`.
     # TODO: SHould we have `Chalf == Int16` and `Cfloat16 == Float16`?
     extendhfsf2(x::Float16) = ccall("extern __extendhfsf2", llvmcall, Float32, (UInt16,), reinterpret(UInt16, x))
